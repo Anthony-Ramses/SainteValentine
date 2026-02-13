@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>💌 For You</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Dancing+Script:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- SHARED PARTICLE CANVAS -->
+  <canvas id="pCanvas"></canvas>
+  <canvas id="confCanvas"></canvas>
+
+  <!-- MUSIC (silent by default, user can mute) -->
+  <audio id="bgMusic" loop preload="auto">
+    <source src="https://www.bensound.com/bensound-music/bensound-romantic.mp3" type="audio/mpeg"/>
+  </audio>
+  <div id="music-note" onclick="toggleMusic()" title="Toggle music">🎵</div>
+
+  <!-- PROGRESS DOTS -->
+  <div id="progress-dots">
+    <div class="dot" data-step="1"></div>
+    <div class="dot" data-step="2"></div>
+    <div class="dot" data-step="3"></div>
+    <div class="dot" data-step="4"></div>
+    <div class="dot" data-step="5"></div>
+    <div class="dot" data-step="6"></div>
+  </div>
+
+  <!-- ═══════════════ SCENE 0: SETUP (MAN ENTERS NAMES + PLANS) ═══════════════ -->
+  <div class="scene active" id="s-setup">
+    <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none;">
+      <div id="setup-hearts"></div>
+    </div>
+    <div class="setup-card">
+      <div class="setup-title">💌 Create Your Valentine's Surprise</div>
+      <div class="setup-sub">Fill in the details below, then send the magic link to him...</div>
+
+      <div class="input-group">
+        <label>His name 💕</label>
+        <input class="love-input" id="inp-her" type="text" placeholder="e.g. Amelia" maxlength="30"/>
+      </div>
+      <div class="input-group">
+        <label>Your name 🌹</label>
+        <input class="love-input" id="inp-him" type="text" placeholder="e.g. Lucas" maxlength="30"/>
+      </div>
+
+      <div class="plans-group">
+        <label>Your Valentine's Day plans together 🗓️</label>
+        <div id="plans-inputs">
+          <div class="plan-item">
+            <input class="love-input" type="text" placeholder="e.g. Breakfast in bed for you 🥞" maxlength="80"/>
+            <button class="plan-remove" onclick="removePlan(this)">✕</button>
+          </div>
+          <div class="plan-item">
+            <input class="love-input" type="text" placeholder="e.g. A romantic walk in the park 🌸" maxlength="80"/>
+            <button class="plan-remove" onclick="removePlan(this)">✕</button>
+          </div>
+          <div class="plan-item">
+            <input class="love-input" type="text" placeholder="e.g. Candlelit dinner just for us 🕯️" maxlength="80"/>
+            <button class="plan-remove" onclick="removePlan(this)">✕</button>
+          </div>
+        </div>
+        <button class="plan-add" onclick="addPlan()">+ Add another plan</button>
+      </div>
+
+      <button class="gen-btn" onclick="generateLink()">✨ Generate His Link ✨</button>
+
+      <div class="link-box" id="link-box">
+        <p>Send this link to her 💌</p>
+        <a id="link-display" href="#" target="_blank"></a>
+        <button class="copy-btn" onclick="copyLink()">📋 Copy Link</button>
+        <div class="copy-success" id="copy-success">✅ Copied to clipboard!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SCENE 1: LANGUAGE ═══════════════ -->
+  <div class="scene" id="s-lang">
+    <div class="lang-bg"></div>
+    <div class="bokeh-layer" id="bokeh-lang"></div>
+    <div class="float-hearts" id="float-lang"></div>
+
+    <div class="lang-card">
+      <div class="lang-greeting" id="lang-greeting">Welcome, my love 💕</div>
+      <div class="lang-title" id="lang-title">A message is waiting for you...</div>
+      <div class="lang-sub">Choose your language / Choisissez votre langue / 言語を選択してください / 选择你的语言</div>
+      <div class="lang-btns">
+        <button class="lang-btn lang-btn-en" onclick="chooseLang('en')">
+          <span class="flag">🇬🇧</span> English
+        </button>
+        <button class="lang-btn lang-btn-fr" onclick="chooseLang('fr')">
+          <span class="flag">🇫🇷</span> Français
+        </button>
+        <button class="lang-btn lang-btn-jp" onclick="chooseLang('jp')">
+          <span class="flag">🇯🇵</span> 日本語
+        </button>
+        <button class="lang-btn lang-btn-cn" onclick="chooseLang('cn')">
+          <span class="flag">🇨🇳</span> 中文
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SCENE 2: ENVELOPE ═══════════════ -->
+  <div class="scene" id="s-envelope">
+    <div class="romantic-bg"></div>
+    <div class="bokeh-layer" id="bokeh-env"></div>
+    <div class="float-hearts" id="float-env"></div>
+
+    <div class="env-wrap">
+      <div class="env-title" id="env-title">Someone sent you something very special... 💌</div>
+      <div class="env-container" id="envelope" onclick="openEnvelope()">
+        <svg class="env-svg" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="40" width="360" height="200" rx="12" fill="#922b21"/>
+          <polygon points="0,240 180,140 360,240" fill="#7b241c"/>
+          <polygon points="0,40 0,240 180,140" fill="#a93226"/>
+          <polygon points="360,40 360,240 180,140" fill="#a93226"/>
+          <rect x="6" y="46" width="348" height="188" rx="9" fill="none" stroke="#f0c040" stroke-width="1.5" opacity="0.5"/>
+          <g class="env-flap">
+            <polygon points="0,40 360,40 180,150" fill="#c0392b"/>
+            <polygon points="4,36 356,36 180,148" fill="#e74c3c" opacity="0.6"/>
+          </g>
+        </svg>
+        <div class="wax-seal">💌</div>
+      </div>
+      <div class="click-hint" id="env-hint">✨ Click to open ✨</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SCENE 3: QUESTION ═══════════════ -->
+  <div class="scene" id="s-question">
+    <div class="romantic-bg"></div>
+    <div class="bokeh-layer" id="bokeh-q"></div>
+
+    <div class="q-card">
+      <div class="q-heart-deco">💖</div>
+      <div class="q-greeting" id="q-greeting">My dearest, <span class="q-name" id="q-name-span"></span></div>
+      <div id="q-text"></div>
+      <div class="divider"><span>🌹</span></div>
+      <div class="btn-row" id="btn-row">
+        <button class="love-btn btn-yes" id="btn-yes" onclick="yesClicked()"></button>
+        <button class="love-btn btn-no"  id="btn-no"  onclick="noClicked()"></button>
+      </div>
+      <div class="q-sig" id="q-sig"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SCENE 4: YES BURST ═══════════════ -->
+  <div class="scene" id="s-yes">
+    <div class="yes-bg"></div>
+    <div class="bokeh-layer" id="bokeh-yes"></div>
+
+    <div class="yes-inner">
+      <img class="yes-gif" id="yes-gif"
+        src="https://media.giphy.com/media/26FLdkAnDdO9OcrEA/giphy.gif"
+        alt="Valentine celebration"
+        onerror="this.src='https://media.giphy.com/media/l4Jz3a8jO92crUlWM/giphy.gif'"
+      />
+      <div class="yes-msg" id="yes-msg"></div>
+      <div class="yes-sub" id="yes-sub"></div>
+      <button class="next-btn" id="yes-next" onclick="goToScene('s-plans')"></button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SCENE 5: DATE PLANS ═══════════════ -->
+  <div class="scene" id="s-plans">
+    <div class="plans-bg"></div>
+    <div class="bokeh-layer" id="bokeh-plans"></div>
+
+    <div class="plans-scroll">
+      <div class="plans-header">
+        <div class="plans-icon">💝</div>
+        <div class="plans-title" id="plans-title"></div>
+        <div class="plans-sub" id="plans-sub"></div>
+      </div>
+      <ul class="plan-list" id="plan-list"></ul>
+      <div class="plans-footer">
+        <button class="plans-next-btn" id="plans-next" onclick="goToScene('s-poem')"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SCENE 6: POEM / LOVE NOTE ═══════════════ -->
+  <div class="scene" id="s-poem">
+    <div class="romantic-bg"></div>
+    <div class="bokeh-layer" id="bokeh-poem"></div>
+
+    <div class="poem-card">
+      <div class="poem-deco">🌹</div>
+      <div class="poem-title" id="poem-title"></div>
+      <div class="poem-lines" id="poem-lines"></div>
+      <div class="poem-sig" id="poem-sig"></div>
+      <button class="next-btn" id="poem-next" onclick="goToScene('s-finale')"></button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SCENE 7: FINALE ═══════════════ -->
+  <div class="scene" id="s-finale">
+    <div class="finale-bg"></div>
+    <div class="emoji-orbit" id="emoji-orbit"></div>
+
+    <div class="finale-inner">
+      <span class="finale-hearts">💖</span>
+      <div class="finale-title" id="finale-title"></div>
+      <div class="finale-sub" id="finale-sub"></div>
+      <div class="finale-sig" id="finale-sig"></div>
+    </div>
+  </div>
+  <script src="index.js"></script>
+</body>
+</html>
