@@ -261,6 +261,7 @@ function generateLink() {
   la.textContent = url;
   lb.style.display = 'block';
   lb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  console.log('generated')
 }
 
 function copyLink() {
